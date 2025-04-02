@@ -56,10 +56,13 @@ python ha.py
 
 If you want to simulate more than a single value for beta or coupling strength, simply modify
 
-# Feedback levels to test
+```bash
+Feedback levels to test
 feedback_strengths = [0.0]  # Different β_max values
-
-# Coupling strengths to test
+```
+```bash
+Coupling strengths to test
 coupling_strengths = [20 / GHz_to_MHz]  # Weak, strong, ultra-strong
+```
 
 The code is already set up for multiple runs at a time.
