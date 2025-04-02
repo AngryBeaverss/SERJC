@@ -39,7 +39,7 @@ SER demonstrates a **practical strategy for energy retention**, even with noisy 
 
 ```bash
 # Clone the repo
-git clone https://github.com/AngryBeaverss/SERJC
+git clone https://github.com/AngryBeaverss/SERJC.git
 cd SERJC
 
 # (Optional) create a virtual environment
