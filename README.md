@@ -39,8 +39,8 @@ SER demonstrates a **practical strategy for energy retention**, even with noisy 
 
 ```bash
 # Clone the repo
-git clone https://github.com/your-name/your-SER-repo.git
-cd your-SER-repo
+git clone https://github.com/AngryBeaverss/SERJC
+cd SERJC
 
 # (Optional) create a virtual environment
 python -m venv venv && source venv/bin/activate
