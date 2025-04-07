@@ -1,0 +1,114 @@
+\documentclass[a4paper,12pt]{article}
+\usepackage{amsmath, amssymb, graphicx, hyperref}
+\usepackage{cite}
+
+\title{Experimental Investigation of Structured Energy Return (SER) Feedback in a Superconducting Qubit-Cavity System}
+\author{Ryan Wallace\thanks{\href{https://orcid.org/0009-0009-8725-1876}{ORCID: 0009-0009-8725-1876}} \\ 
+\texttt{rathmon@gmail.com}}
+\date{\today}
+
+\begin{document}
+
+\maketitle
+
+\begin{abstract}
+This experiment investigates quantum work extraction (ergotropy) and coherence retention in a superconducting two-qubit Jaynes-Cummings system with feedback control. By implementing adaptive feedback in a real superconducting circuit, we aim to test whether coherence-based energy retention outperforms entanglement-based strategies in preserving extractable work. Our experimental setup uses a transmon qubit-cavity system in a dilution refrigerator and applies feedback with a tunable delay (\(\tau_f\)) to analyze its impact on system coherence and work extraction.
+\end{abstract}
+
+\section{Introduction}
+Quantum thermodynamics examines energy conversion in quantum systems, where coherence and entanglement significantly impact energy extraction. The Jaynes-Cummings (JC) model describes the interaction of a two-level system (qubit) with a cavity mode, exhibiting Rabi oscillations. However, in real quantum devices, decoherence rapidly destroys quantum correlations, limiting work extraction.
+
+This experiment seeks to validate the \textbf{Structured Energy Return (SER) hypothesis} in a real superconducting qubit-cavity system. Unlike traditional feedback schemes, SER-based control preserves coherence rather than just suppressing noise. We will investigate:
+\begin{itemize}
+    \item How feedback delay (\(\tau_f\)) impacts coherence and work retention.
+    \item Whether coherence-based feedback improves ergotropy over entanglement-based methods.
+    \item The relationship between qubit-cavity coupling (\(g\)), feedback strength (\(\beta\)), and energy retention.
+\end{itemize}
+
+\section{Experimental Setup}
+\subsection{Hardware Implementation}
+The experiment will be conducted using a superconducting transmon qubit coupled to a microwave cavity. The system will be housed inside a dilution refrigerator (10-15mK) to minimize thermal noise. The setup consists of:
+\begin{itemize}
+    \item \textbf{Superconducting qubits} (IBM-Q or Rigetti hardware)
+    \item \textbf{Microwave cavity resonators} for Jaynes-Cummings interaction
+    \item \textbf{Classical control electronics} (FPGA-based feedback implementation)
+    \item \textbf{Measurement setup} for state tomography
+\end{itemize}
+
+\subsection{System Hamiltonian}
+The system Hamiltonian follows the Jaynes-Cummings model:
+\begin{equation}
+H = \frac{\hbar \omega_q}{2} \sigma_z + \hbar \omega_c a^\dagger a + \hbar g (\sigma_+ a + \sigma_- a^\dagger)
+\end{equation}
+where:
+\begin{itemize}
+    \item \( \omega_q \) and \( \omega_c \) are qubit and cavity frequencies.
+    \item \( g \) is the coupling strength.
+    \item \( \sigma_+ \), \( \sigma_- \) are the qubit raising/lowering operators.
+    \item \( a^\dagger \), \( a \) are the cavity photon creation/annihilation operators.
+\end{itemize}
+
+\textbf{Feedback is introduced} with a control Hamiltonian:
+\begin{equation}
+H_{FB} = \beta ( \sigma_x \otimes \sigma_x + (a + a^\dagger) )
+\end{equation}
+where \( \beta \) is an adaptive parameter based on system concurrence.
+
+\subsection{Feedback Mechanism}
+The system will be initialized in a Bell state, and a feedback loop will be applied after a tunable delay \( \tau_f \). The feedback strength \( \beta \) is dynamically adjusted based on concurrence:
+\begin{equation}
+F(\rho) = (1 - C) e^{-C}
+\end{equation}
+where \( C \) is the concurrence of the two-qubit reduced density matrix.
+
+\section{Experimental Procedure}
+
+\subsection{Step 1: System Initialization}
+\begin{itemize}
+    \item Prepare the qubit-cavity system in a Bell state.
+    \item Use a microwave drive to simulate Rabi oscillations.
+\end{itemize}
+
+\subsection{Step 2: Feedback Application}
+\begin{itemize}
+    \item Apply feedback control with varying delay times (\(\tau_f\)).
+    \item Use FPGA-based real-time measurement to estimate system concurrence.
+    \item Dynamically adjust feedback strength (\(\beta\)) based on concurrence.
+\end{itemize}
+
+\subsection{Step 3: Measurement and Data Collection}
+\begin{itemize}
+    \item Perform Quantum State Tomography (QST) to reconstruct the system's density matrix.
+    \item Compute:
+    \begin{itemize}
+        \item Concurrence \( C \) (Entanglement measure)
+        \item Ergotropy \( W_{ex} \) (Extractable Work)
+        \item Cavity photon number \( \langle n \rangle \)
+    \end{itemize}
+    \item Analyze how feedback strength and delay impact coherence and work extraction.
+\end{itemize}
+
+\section{Expected Results}
+\begin{itemize}
+    \item Delayed feedback should enhance work retention compared to uncontrolled evolution.
+    \item Ergotropy and concurrence may not be strictly correlated, indicating coherence-based correlations play a role.
+    \item An optimal feedback delay (\(\tau_f\)) exists that maximizes extractable work.
+    \item Superconducting qubit data should match numerical simulations from \texttt{ah.py}.
+\end{itemize}
+
+
+\section{Conclusion and Future Work}
+This study could validate feedback-controlled quantum work extraction using superconducting qubits. Future directions include:
+\begin{itemize}
+    \item Testing SER feedback on larger qubit arrays.
+    \item Exploring alternative feedback functions based on coherence instead of concurrence.
+    \item Real-world applications in quantum heat engines and quantum batteries.
+\end{itemize}
+
+\section{References}
+\begin{enumerate}
+    \item Jaynes, E.T., \& Cummings, F.W. (1963). \textit{Comparison of quantum and semiclassical radiation theories with application to the beam maser}. IEEE Transactions on Information Theory.
+    \item Wallace, R. (2025). \textit{Structured Energy Return in Quantum Systems: Extended Analysis}. arXiv preprint.
+\end{enumerate}
+
+\end{document}
