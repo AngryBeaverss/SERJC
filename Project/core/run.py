@@ -20,12 +20,24 @@ def initialize_state(params):
     rho_init[:4, :4] = rho_bell
     return np.concatenate([rho_init.real.flatten(), rho_init.imag.flatten()])
 
+def get_rho_target(dim_system):
+    psi_target = (np.kron([1, 0], [0, 1]) + np.kron([0, 1], [1, 0])) / np.sqrt(2)
+    rho_target = np.outer(psi_target, psi_target.conj())
+    rho_target_full = np.zeros((dim_system, dim_system), dtype=complex)
+    rho_target_full[:4, :4] = rho_target
+    return rho_target_full
+
 if __name__ == '__main__':
     parser = argparse.ArgumentParser()
     parser.add_argument('--coupling', type=float, default=20.0)
     parser.add_argument('--feedback_mode', type=str, default='adaptive')  # <-- NEW
     parser.add_argument('--drive_strength_real', type=float)
     parser.add_argument('--gamma_spont_real', type=float)
+    parser.add_argument('--kappa_real', type=float)
+    parser.add_argument('--beta_max', type=float)
+    parser.add_argument('--tau_f', type=float)
+    parser.add_argument('--total_time', type=float)
+    parser.add_argument('--num_time_points', type=int)
     args = parser.parse_args()
 
     for k, v in vars(args).items():
@@ -37,9 +49,13 @@ if __name__ == '__main__':
     params['coupling_strength'] = args.coupling / params['GHz_to_MHz']
     params['feedback_mode'] = args.feedback_mode  # <-- NEW
 
+    dim_system = 4 * params['n_max']
+    if params['feedback_mode'] == 'lyapunov':
+        print("Injecting rho_target for Lyapunov mode...")
+        params['rho_target'] = get_rho_target(dim_system)
+
     time_points = np.linspace(0, params['total_time'], params['num_time_points'])
     rho_init_flat = initialize_state(params)
-    dim_system = 4 * params['n_max']
     a_dagger_a_full = np.kron(np.eye(4), params['a_dagger'] @ params['a'])
 
     # Hamiltonian setup (now using dynamic coupling strength)

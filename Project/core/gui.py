@@ -15,6 +15,7 @@ import traceback
 from observables import plot_results
 from observables import plot_ergotropy_difference
 from workers import SimulationWorker
+from datetime import datetime
 
 
 class SER_GUI(QWidget):
@@ -62,9 +63,10 @@ class SER_GUI(QWidget):
             spinbox.setSingleStep(step)
             spinbox.setValue(default)
             spinbox.setMaximumWidth(100)
+            spinbox.setDecimals(4)
 
             layout.addWidget(label)
-            layout.addStretch()
+            # layout.addStretch()
             layout.addWidget(spinbox)
             param_layout.addLayout(layout)
 
@@ -84,7 +86,7 @@ class SER_GUI(QWidget):
         layout.addWidget(param_group)
 
         self.feedback_selector = QComboBox()
-        self.feedback_selector.addItems(["none", "adaptive", "fixed"])
+        self.feedback_selector.addItems(["none", "adaptive", "fixed", "lyapunov"])
         layout.addWidget(self.feedback_selector)
 
         self.clear_plot_checkbox = QCheckBox("Clear previous runs")
@@ -97,6 +99,10 @@ class SER_GUI(QWidget):
         self.compare_button = QPushButton("Compare Ergotropy: Adaptive - Fixed")
         self.compare_button.clicked.connect(self.compare_ergotropy)
         layout.addWidget(self.compare_button)
+
+        self.save_button = QPushButton("Save Figure")
+        self.save_button.clicked.connect(self.save_figure)
+        layout.addWidget(self.save_button)
 
         self.run_button = QPushButton('Run Simulation')
         self.run_button.clicked.connect(self.run_simulation)
@@ -185,18 +191,31 @@ class SER_GUI(QWidget):
         print("[SIM ERROR] Message from worker:\n", msg)
 
     def compare_ergotropy(self):
-        adaptive_key = f"adaptive_{self.slider_coupling.value()}"
-        fixed_key = f"fixed_{self.slider_coupling.value()}"
+        coupling = self.slider_coupling.value()
+        keys = [k for k in self.results_store if k.endswith(f"_{coupling}")]
+        if len(keys) < 2:
+            print("Need at least two modes for current coupling to compare.")
+            return
 
-        if adaptive_key in self.results_store and fixed_key in self.results_store:
-            t = self.results_store[adaptive_key]['time']
-            erg_adaptive = self.results_store[adaptive_key]['ergotropy']
-            erg_fixed = self.results_store[fixed_key]['ergotropy']
+        self.ax.clear()
+        for key in keys:
+            mode = key.split("_")[0]
+            result = self.results_store[key]
+            t = result['time']
+            erg = result['ergotropy']
+            self.ax.plot(t, erg, label=f"{mode} - Ergotropy")
 
-            plot_ergotropy_difference(self.ax, t, erg_adaptive, erg_fixed)
-            self.plot_widget.draw()
-        else:
-            print("Run both 'adaptive' and 'fixed' for current coupling first.")
+            if self.work_checkbox.isChecked():
+                t_mid = 0.5 * (t[:-1] + t[1:])
+                dE_dt = np.diff(erg) / np.diff(t)
+                self.ax.plot(t_mid, dE_dt, linestyle='--', label=f"{mode} - dErgotropy/dt")
+
+        self.ax.set_title(f"Ergotropy Comparison @ {coupling} MHz")
+        self.ax.set_xlabel("Time")
+        self.ax.set_ylabel("Value")
+        self.ax.legend()
+        self.ax.grid(True)
+        self.plot_widget.draw_idle()
 
     def run_simulation(self):
         coupling = self.slider_coupling.value()
@@ -220,6 +239,17 @@ class SER_GUI(QWidget):
         self.worker.finished.connect(self.on_simulation_finished)
         self.worker.error.connect(self.on_simulation_error)
         self.worker.start()
+
+    def save_figure(self):
+        coupling = self.slider_coupling.value()
+        mode = self.feedback_selector.currentText()
+        timestamp = datetime.now().strftime("%Y-%m-%d_%H-%M-%S")
+        filename = f"ergotropy_{coupling}MHz_{mode}_{timestamp}.png"
+        save_path = os.path.join(os.getcwd(), "figs")
+        os.makedirs(save_path, exist_ok=True)
+        filepath = os.path.join(save_path, filename)
+        self.plot_widget.figure.savefig(filepath, dpi=300)
+        print(f"[SAVED] Figure saved to: {filepath}")
 
 if __name__ == "__main__":
     app = QApplication(sys.argv)
